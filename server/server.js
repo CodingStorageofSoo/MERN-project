@@ -1,7 +1,11 @@
+require("dotenv").config();
+
 const express = require("express");
 const multer = require("multer");
 const { v4: uuid } = require("uuid");
 const mime = require("mime-types");
+
+const mongoose = require("mongoose");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "./uploads"),
@@ -23,13 +27,19 @@ const upload = multer({
 const app = express();
 const PORT = 8000;
 
-app.use("/uploads", express.static("uploads"));
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB Connected.");
+    app.use("/uploads", express.static("uploads"));
 
-app.post("/upload", upload.single("image"), (req, res) => {
-  console.log(req.file);
-  res.json(req.file);
-});
+    app.post("/upload", upload.single("image"), (req, res) => {
+      console.log(req.file);
+      res.json(req.file);
+    });
 
-app.listen(PORT, function () {
-  console.log("Express server listening on PORT" + PORT);
-});
+    app.listen(PORT, function () {
+      console.log("Express server listening on PORT" + PORT);
+    });
+  })
+  .catch((err) => console.log(err));
