@@ -11,7 +11,7 @@
 3. Database : MongoDB
 4. Storage : AWS S3
 
-## 2. Front-End Function
+## 2. Front-End Functions
 
 1. Upload Form 
 
@@ -27,6 +27,10 @@
 
     > Solutions : Context API
 
-3.
+## 3. Back-End Functions 
 
-## 3.
+1. 
+
+2. 
+
+3. SignIn & SignUp 
