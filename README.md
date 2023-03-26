@@ -13,24 +13,5 @@
 
 ## 2. Front-End Functions
 
-1. Upload Form 
-
-1) 
-
-2) Progress Bar
-
-2. Image List
-
-1)
-
-2) Automatically Update Images 
-
-    > Solutions : Context API
 
 ## 3. Back-End Functions 
-
-1. 
-
-2. 
-
-3. SignIn & SignUp 
