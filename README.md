@@ -1,4 +1,4 @@
-# Album Project
+# MERN Project
 
 ## 0. Problem
 
@@ -6,12 +6,10 @@
 
 ## 1. Develping Environment
 
-1. Front-End : React
+1. Front-End : ReactJS, NextJS
 2. Back-End : NodeJS, ExpressJS
-3. Database : MongoDB
-4. Storage : AWS S3
+3. DevOps : MongoDB, Amazon Lambda, Amazon S3
 
 ## 2. Front-End Functions
-
 
 ## 3. Back-End Functions 
