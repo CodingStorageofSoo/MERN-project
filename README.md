@@ -1,17 +1,3 @@
-# MERN Project
+# Couple Album
 
-## 0. Problem
-
-> How to store image file?
-
-## 1. Develping Environment
-
-1. Front-End : ReactJS, NextJS
-2. Back-End : NodeJS, ExpressJS
-3. DevOps : MongoDB, Amazon Lambda, Amazon S3
-
-## 2. Front-End Functions
-
-## 3. Back-End Functions 
-
-from this!! 
+https://luminous-arrow-95e.notion.site/Personal-Couple-Album-39b314268b6a47e0925b989c4ba513c7
