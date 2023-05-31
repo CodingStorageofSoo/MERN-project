@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import "./UploadForm.css";
 import { toast } from "react-toastify";
 import ProgressBar from "./ProgressBar";
+import { ImageContext } from "../context/ImageContext";
 
 const UploadForm = () => {
+  const [images, setImages] = useContext(ImageContext);
   const defaultFileName = "Please upload image file";
   const [imageFile, setImageFile] = useState(null);
   const [imgSrc, setImgSrc] = useState(null);
@@ -25,12 +27,15 @@ const UploadForm = () => {
     const formData = new FormData();
     formData.append("imageTest", imageFile);
     try {
-      const res = await axios.post("/upload", formData, {
+      const res = await axios.post("/images", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (e) => {
           setPercent(Math.round((100 * e.loaded) / e.total));
         },
       });
+
+      setImages([...images, res.data]);
+
       toast.success("success!");
       setTimeout(() => {
         setPercent(0);
