@@ -1,17 +1,26 @@
 import React from "react";
-import UploadForm from "./components/UploadForm";
-
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ImageList from "./components/ImageList";
+
+import { Routes, Route, Navigate } from "react-router-dom";
+
+import ToolBar from "./components/ToolBar";
+import MainPage from "./pages/MainPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 
 function App() {
   return (
     <div style={{ maxWidth: 600, margin: "auto" }}>
       <ToastContainer />
-      <h2>Couple Album</h2>
-      <UploadForm />
-      <ImageList />
+      <ToolBar />
+      <Routes>
+        <Route path="/auth/register" element={<RegisterPage />} />
+        <Route path="/auth/login" element={<LoginPage />} />
+        <Route path="/" element={<MainPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* To keep the history clean, you should set replace prop. */}
+      </Routes>
     </div>
   );
 }

@@ -6,11 +6,6 @@ const mongoose = require("mongoose");
 
 userRouter.post("/register", async (req, res) => {
   try {
-    if (req.body.username.length < 3)
-      throw new Error("Make the username longer than 3 characters");
-    if (req.body.password.length < 6)
-      throw new Error("Make the password longer than 6 characters");
-
     const hashedPassword = await hash(req.body.password, 10);
 
     const user = await new User({
@@ -35,6 +30,7 @@ userRouter.post("/register", async (req, res) => {
 userRouter.patch("/login", async (req, res) => {
   try {
     const user = await User.findOne({ username: req.body.username });
+    if (!user) throw new Error("Invalid Information");
     const isValid = await compare(req.body.password, user.hashedPassword);
     if (!isValid) throw new Error("Invalid Information");
 
@@ -48,6 +44,7 @@ userRouter.patch("/login", async (req, res) => {
       message: "User Validated",
       sessionId: session._id,
       name: user.name,
+      userId: user._id,
     });
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -65,6 +62,21 @@ userRouter.patch("/logout", async (req, res) => {
     );
     res.json({ message: "User is logged out" });
   } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+userRouter.get("/me", (req, res) => {
+  try {
+    if (!req.user) throw new Error("No Authorization");
+    res.json({
+      message: "success",
+      sessionId: req.headers.sessionid,
+      name: req.user.name,
+      userId: req.user._id,
+    });
+  } catch (err) {
+    console.log(err);
     res.status(400).json({ message: err.message });
   }
 });

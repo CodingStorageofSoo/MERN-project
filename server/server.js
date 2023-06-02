@@ -8,6 +8,7 @@ const mongoose = require("mongoose");
 const { imageRouter } = require("./routes/imageRouter");
 const { userRouter } = require("./routes/userRouter");
 const { authenticate } = require("./middleware/authentication");
+
 mongoose
   .connect(MONGO_URI)
   .then(() => {
