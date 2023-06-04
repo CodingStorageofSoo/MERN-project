@@ -8,6 +8,7 @@ import ToolBar from "./components/ToolBar";
 import MainPage from "./pages/MainPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import ImagePage from "./pages/ImagePage";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <ToastContainer />
       <ToolBar />
       <Routes>
+        <Route path="/images/:imageId" element={<ImagePage />}></Route>
         <Route path="/auth/register" element={<RegisterPage />} />
         <Route path="/auth/login" element={<LoginPage />} />
         <Route path="/" element={<MainPage />} />

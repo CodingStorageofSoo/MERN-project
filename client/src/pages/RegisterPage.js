@@ -52,17 +52,11 @@ const RegisterPage = () => {
     >
       <h3>Register</h3>
       <form onSubmit={submitHandler}>
-        <CustomInput label="Name" value={name} setValue={setName} />
-        <CustomInput label="Username" value={username} setValue={setUsername} />
-        <CustomInput
-          label="Password"
-          value={password}
-          setValue={setPassword}
-          type="password"
-        />
+        <CustomInput label="Name" setValue={setName} />
+        <CustomInput label="Username" setValue={setUsername} />
+        <CustomInput label="Password" setValue={setPassword} type="password" />
         <CustomInput
           label="Confirm Password"
-          value={passwordCheck}
           setValue={setPasswordCheck}
           type="password"
         />

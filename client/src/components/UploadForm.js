@@ -6,12 +6,13 @@ import ProgressBar from "./ProgressBar";
 import { ImageContext } from "../context/ImageContext";
 
 const UploadForm = () => {
-  const [images, setImages] = useContext(ImageContext);
+  const { images, setImages, myImages, setMyImages } = useContext(ImageContext);
   const defaultFileName = "Please upload image file";
   const [imageFile, setImageFile] = useState(null);
   const [imgSrc, setImgSrc] = useState(null);
   const [fileName, setFileName] = useState(defaultFileName);
   const [percent, setPercent] = useState(0);
+  const [isPublic, setIsPublic] = useState(true);
 
   const imageSelectHandler = (event) => {
     const imageFileInfo = event.target.files[0];
@@ -26,6 +27,7 @@ const UploadForm = () => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("imageTest", imageFile);
+    formData.append("public", isPublic);
     try {
       const res = await axios.post("/images", formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -34,7 +36,8 @@ const UploadForm = () => {
         },
       });
 
-      setImages([...images, res.data]);
+      if (isPublic) setImages([...images, res.data]);
+      else setMyImages([...myImages, res.data]);
 
       toast.success("success!");
       setTimeout(() => {
@@ -56,6 +59,7 @@ const UploadForm = () => {
       <form onSubmit={onSubmit}>
         <img
           src={imgSrc}
+          alt=""
           className={`image-preview ${imgSrc && "image-preview-show"}`}
         ></img>
         <ProgressBar percent={percent} />
@@ -68,6 +72,13 @@ const UploadForm = () => {
             onChange={imageSelectHandler}
           />
         </div>
+        <input
+          type="checkbox"
+          id="public-check"
+          value={!isPublic}
+          onChange={() => setIsPublic(!isPublic)}
+        />
+        <label htmlFor="public-check">비공개</label>
         <button
           type="submit"
           style={{

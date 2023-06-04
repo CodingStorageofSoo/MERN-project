@@ -7,10 +7,10 @@ export const AuthProvider = ({ children }) => {
   const [me, setMe] = useState();
 
   useEffect(() => {
-    const sessionId = localStorage.getItem("sessionId");
-    console.log({ sessionId });
+    const sessionId = localStorage.getItem("sessionId"); // the localStorage object is a built-in web API provided by the browser that allows you to store key-value pairs locally in the user's browser.
+
     if (me) {
-      axios.defaults.headers.common.sessionid = me.sessionId;
+      axios.defaults.headers.common.sessionid = me.sessionId; // Using, Axios, add "sessionid" to the header in HTTP Request
       localStorage.setItem("sessionId", me.sessionId);
     } else if (sessionId) {
       axios

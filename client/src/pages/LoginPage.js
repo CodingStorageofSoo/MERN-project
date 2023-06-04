@@ -14,7 +14,9 @@ const LoginPage = () => {
   const loginHandler = async (e) => {
     try {
       e.preventDefault();
+
       const result = await axios.patch("/users/login", { username, password });
+
       setMe({
         name: result.data.name,
         sessionId: result.data.sessionId,
@@ -39,13 +41,8 @@ const LoginPage = () => {
     >
       <h3>Log In</h3>
       <form onSubmit={loginHandler}>
-        <CustomInput label="Username" value={username} setValue={setUsername} />
-        <CustomInput
-          label="Password"
-          value={password}
-          setValue={setPassword}
-          type="password"
-        />
+        <CustomInput label="Username" setValue={setUsername} />
+        <CustomInput label="Password" setValue={setPassword} type="password" />
         <button type="submit">Log In!</button>
       </form>
     </div>
