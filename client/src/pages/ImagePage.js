@@ -65,9 +65,11 @@ const ImagePage = () => {
           Delete
         </button>
       )}
-      <button style={{ float: "right" }} onClick={onSubmit}>
-        {hasLiked ? "Cancel Like" : "Like"}
-      </button>
+      {me && (
+        <button style={{ float: "right" }} onClick={onSubmit}>
+          {hasLiked ? "Cancel Like" : "Like"}
+        </button>
+      )}
     </div>
   );
 };

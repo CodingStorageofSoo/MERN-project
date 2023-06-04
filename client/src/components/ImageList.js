@@ -7,7 +7,7 @@ import "./ImageList.css";
 
 const ImageList = () => {
   const { images, myImages, isPublic, setIsPublic } = useContext(ImageContext);
-  const me = useContext(AuthContext);
+  const [me] = useContext(AuthContext);
 
   const imgList = (isPublic ? images : myImages).map((image) => (
     <Link
