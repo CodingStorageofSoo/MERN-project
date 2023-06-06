@@ -63,6 +63,22 @@ imageRouter.get("/", async (req, res) => {
   }
 });
 
+imageRouter.get("/:imageId", async (req, res) => {
+  try {
+    const { imageId } = req.params.imageId;
+    if (!mongoose.isValidObjectId(imageId))
+      throw new Error("The image ID is invalid");
+    const image = await Image.findOne({ _id: imageId });
+    if (!image) throw new Error("Not found");
+    if (!image.public && (!req.user || req.user.id !== image.user.id))
+      throw new Error("No Authorization");
+    res.json(image);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: err.message });
+  }
+});
+
 imageRouter.delete("/:imageId", async (req, res) => {
   try {
     if (!req.user) throw new Error("No Authorization");

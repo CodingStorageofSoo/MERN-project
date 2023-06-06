@@ -49,7 +49,6 @@ const ImageList = () => {
       <h3 style={{ display: "inline-block", marginRight: 10 }}>
         Image List ({isPublic ? "Public" : "Private"} Photo)
       </h3>
-      <h3>{me}</h3>
       {me && (
         <button onClick={() => setIsPublic(!isPublic)}>
           {(isPublic ? "Private" : "Public") + " Photo"}

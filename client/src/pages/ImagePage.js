@@ -11,19 +11,39 @@ const ImagePage = () => {
   const { images, setImages, setMyImages } = useContext(ImageContext);
   const [me] = useContext(AuthContext);
   const [hasLiked, setHasLiked] = useState(false);
-  const image = images.find((image) => image._id === imageId);
+  const [image, setImage] = useState();
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const img = images.find((image) => image._id === imageId);
+    if (img) setImage(img);
+  }, [images, imageId]);
+
+  useEffect(() => {
+    if (image && image._id === imageId) return;
+    axios
+      .get(`/images/${imageId}`)
+      .then(({ data }) => {
+        setImage(data);
+        setError(false);
+      })
+      .catch((err) => {
+        setError(true);
+        toast.error(err.response.data.message);
+      });
+  }, [imageId, image]);
 
   useEffect(() => {
     if (me && image && image.likes.includes(me.userId)) setHasLiked(true);
   }, [me, image]);
-
+  if (error) return <h3>Error...</h3>;
   if (!image) return <h3>Loading...</h3>;
 
   const updateImage = (images, image) =>
-    [...images.filter((image) => image._id !== imageId), image].sort(
-      (a, b) =>
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    );
+    [...images.filter((image) => image._id !== imageId), image].sort((a, b) => {
+      if (a._id < b._id) return 1;
+      else return -1;
+    });
 
   const onSubmit = async () => {
     const result = await axios.patch(
@@ -31,7 +51,7 @@ const ImagePage = () => {
     );
     if (result.data.public)
       setImages((prevData) => updateImage(prevData, result.data));
-    else setImages((prevData) => updateImage(prevData, result.data));
+    setMyImages((prevData) => updateImage(prevData, result.data));
     setHasLiked(!hasLiked);
   };
 
