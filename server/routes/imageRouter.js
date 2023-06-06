@@ -9,20 +9,26 @@ const fileUnlink = promisify(fs.unlink);
 
 const mongoose = require("mongoose");
 
-imageRouter.post("/", upload.single("imageTest"), async (req, res) => {
+imageRouter.post("/", upload.array("imageTest", 5), async (req, res) => {
   try {
     if (!req.user) throw new Error("No Authorization");
-    const image = await new Image({
-      user: {
-        _id: req.user.id,
-        name: req.user.name,
-        username: req.user.username,
-      },
-      public: req.body.public,
-      key: req.file.filename,
-      originalFileName: req.file.originalname,
-    }).save();
-    res.json(image);
+    const images = await Promise.all(
+      req.files.map(async (file) => {
+        const image = await new Image({
+          user: {
+            _id: req.user.id,
+            name: req.user.name,
+            username: req.user.username,
+          },
+          public: req.body.public,
+          key: file.filename,
+          originalFileName: file.originalname,
+        }).save();
+        return image;
+      })
+    );
+
+    res.json(images);
   } catch (err) {
     console.log(err);
     res.status(400).json({ message: err.message });
@@ -30,8 +36,31 @@ imageRouter.post("/", upload.single("imageTest"), async (req, res) => {
 });
 
 imageRouter.get("/", async (req, res) => {
-  const images = await Image.find({ public: true });
-  res.json(images);
+  // offset vs cursor
+
+  // offset : Offset-based pagination divides data into pages using a numerical value (offset) that represents the starting position of the retrieved data. Typically, it takes the page number and page size as inputs. The starting position for the requested page is calculated by multiplying the page number by the page size.
+
+  // cursor : Cursor-based pagination retrieves a new page of data based on the last data item from the previous page.
+
+  try {
+    const { lastid } = req.query;
+    if (lastid && !mongoose.isValidObjectId(lastid))
+      throw new Error("invalid lastid");
+    const images = await Image.find(
+      lastid
+        ? {
+            public: true,
+            _id: { $lt: lastid },
+          }
+        : { public: true }
+    )
+      .sort({ _id: -1 })
+      .limit(10);
+    res.json(images);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: err.message });
+  }
 });
 
 imageRouter.delete("/:imageId", async (req, res) => {

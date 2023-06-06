@@ -35,7 +35,8 @@ userRouter.patch("/login", async (req, res) => {
     const isValid = await compare(req.body.password, user.hashedPassword);
     if (!isValid) throw new Error("Invalid Information");
 
-    user.sessions.push({ createdAt: new Date() });
+    user.sessions.push({ createdAt: new Date() }); // the ID of the data is used as the session ID.
+
     await user.save();
 
     const session = user.sessions[user.sessions.length - 1];
@@ -84,8 +85,19 @@ userRouter.get("/me", (req, res) => {
 
 userRouter.get("/me/images", async (req, res) => {
   try {
+    const { lastid } = req.query;
+    if (lastid && !mongoose.isValidObjectId(lastid))
+      throw new Error("invalid lastid");
     if (!req.user) throw new Error("No Authorization");
-    const images = await Image.find({ "user._id": req.user.id });
+    const images = await Image.find(
+      lastid
+        ? { "user._id": req.user.id, _id: { $lt: lastid } }
+        : { "user._id": req.user.id }
+    )
+      .sort({
+        _id: -1,
+      })
+      .limit(30);
     res.json(images);
   } catch (err) {
     console.log(err);
