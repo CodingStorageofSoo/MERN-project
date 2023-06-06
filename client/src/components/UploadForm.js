@@ -6,28 +6,43 @@ import ProgressBar from "./ProgressBar";
 import { ImageContext } from "../context/ImageContext";
 
 const UploadForm = () => {
-  const { images, setImages, myImages, setMyImages } = useContext(ImageContext);
-  const defaultFileName = "Please upload image file";
-  const [imageFile, setImageFile] = useState(null);
-  const [imgSrc, setImgSrc] = useState(null);
-  const [fileName, setFileName] = useState(defaultFileName);
+  const { setImages } = useContext(ImageContext);
+  const [imageFiles, setImageFiles] = useState(null);
+
+  const [previews, setPreviews] = useState([]);
+
   const [percent, setPercent] = useState(0);
   const [isPublic, setIsPublic] = useState(true);
 
-  const imageSelectHandler = (event) => {
-    const imageFileInfo = event.target.files[0];
-    setImageFile(imageFileInfo);
-    setFileName(imageFileInfo.name);
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(imageFileInfo);
-    fileReader.onload = (e) => setImgSrc(e.target.result);
+  const imageSelectHandler = async (event) => {
+    const imageFileInfo = event.target.files;
+    setImageFiles(imageFileInfo);
+
+    const imagePreviews = await Promise.all(
+      [...imageFileInfo].map(async (imgFile) => {
+        return new Promise((resolve, reject) => {
+          try {
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(imgFile);
+            fileReader.onload = (e) =>
+              resolve({ imgSrc: e.target.result, fileName: imgFile.name });
+          } catch (err) {
+            reject(err);
+          }
+        });
+      })
+    );
+    setPreviews(imagePreviews);
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("imageTest", imageFile);
+    for (let imageFile of imageFiles) {
+      formData.append("imageTest", imageFile);
+    }
     formData.append("public", isPublic);
+
     try {
       const res = await axios.post("/images", formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -36,38 +51,51 @@ const UploadForm = () => {
         },
       });
 
-      if (isPublic) setImages([...images, res.data]);
-      else setMyImages([...myImages, res.data]);
+      setImages((prevData) => [...prevData, ...res.data]);
 
       toast.success("success!");
+
       setTimeout(() => {
         setPercent(0);
-        setFileName(defaultFileName);
-        setImgSrc(null);
+        setPreviews([]);
       }, 3000);
     } catch (err) {
-      console.log({ err });
+      toast.error(err.response.data.message);
       setPercent(0);
-      setFileName(defaultFileName);
-      setImgSrc(null);
-      toast.error("fail!");
+      setPreviews([]);
+      console.error(err);
     }
   };
+
+  const previewImages = previews.map((preview, index) => (
+    <img
+      key={index}
+      style={{ width: 200, height: 200, objectFit: "cover" }}
+      src={preview.imgSrc}
+      alt=""
+      className={`image-preview ${preview.imgSrc && "image-preview-show"}`}
+    />
+  ));
+
+  const fileName =
+    previews.length === 0
+      ? "Please upload image file"
+      : previews.reduce(
+          (previous, current) => previous + `${current.fileName},`,
+          ""
+        );
 
   return (
     <>
       <form onSubmit={onSubmit}>
-        <img
-          src={imgSrc}
-          alt=""
-          className={`image-preview ${imgSrc && "image-preview-show"}`}
-        ></img>
+        <div style={{ display: "flex", flexWrap: "wrap" }}>{previewImages}</div>
         <ProgressBar percent={percent} />
         <div className="file-dropper">
           {fileName}
           <input
             id="image"
             type="file"
+            multiple={true}
             accept="image/*"
             onChange={imageSelectHandler}
           />

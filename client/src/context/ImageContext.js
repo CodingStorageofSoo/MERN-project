@@ -1,4 +1,10 @@
-import React, { useState, useEffect, createContext, useContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  useRef,
+} from "react";
 import axios from "axios";
 import { AuthContext } from "./AuthContext";
 
@@ -11,14 +17,35 @@ export const ImageProvider = (prop) => {
 
   const [isPublic, setIsPublic] = useState(true);
 
+  const [imageUrl, setImageUrl] = useState("/images");
+
+  const [imageLoading, setImageLoading] = useState(false);
+
+  const [imageError, setImageError] = useState(false);
+
   const [me] = useContext(AuthContext);
 
+  const pastImageUrlRef = useRef();
+
   useEffect(() => {
+    if (pastImageUrlRef.current === imageUrl) return;
+    setImageLoading(true);
     axios
-      .get("/images")
-      .then((result) => setImages(result.data))
-      .catch((err) => console.log(err));
-  }, []);
+      .get(imageUrl)
+      .then((result) =>
+        isPublic
+          ? setImages((prevData) => [...prevData, ...result.data])
+          : setMyImages((prevData) => [...prevData, ...result.data])
+      )
+      .catch((err) => {
+        console.log(err);
+        setImageError(err);
+      })
+      .finally(() => {
+        setImageLoading(false);
+        pastImageUrlRef.current = imageUrl;
+      });
+  }, [imageUrl, isPublic]); // get public data
 
   useEffect(() => {
     if (me) {
@@ -37,12 +64,14 @@ export const ImageProvider = (prop) => {
   return (
     <ImageContext.Provider
       value={{
-        images,
+        images: isPublic ? images : myImages,
         setImages,
-        myImages,
         setMyImages,
         isPublic,
         setIsPublic,
+        setImageUrl,
+        imageLoading,
+        imageError,
       }}
     >
       {prop.children}
